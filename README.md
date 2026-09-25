@@ -16,7 +16,13 @@ Ative `PORTFOLIO_DEMO=1` **somente em um banco dedicado**. O acesso é feito pel
 
 32 questões originais, 4 componentes, 2 avaliações montadas.
 
-A publicação online e os testes em PostgreSQL/Vercel ainda precisam ser concluídos. Nenhuma URL de aplicação é anunciada como funcional antes dessa verificação.
+[**Abrir demonstração**](https://rn-examforge-demo.vercel.app) · [Portfólio visual](https://rn-dev-portfolio-orcin.vercel.app)
+
+![Banco de questões — dados sintéticos](docs/screenshots/dashboard.webp)
+
+Publicado na Vercel com PostgreSQL Neon dedicado. Fluxos principais verificados no navegador em 25/09/2026, incluindo gravação e leitura entre requisições. A primeira abertura após inatividade pode levar alguns segundos.
+
+Entrada como Clara Mendes. Geração e revisão são simuladas; apenas a revisão humana aprova itens. Montagem, gabarito e exportação Blackboard TXT verificados.
 
 ## Execução local
 
@@ -36,7 +42,7 @@ Os bancos locais são ignorados pelo Git. `seed_demo` é idempotente: executá-l
 
 ## Publicação na Vercel
 
-O arquivo `vercel.json` encaminha a aplicação Python e serve os assets estáticos. Configure exclusivamente no ambiente da plataforma:
+O arquivo `vercel.json` usa a integração nativa Python da Vercel. `demo_build.py` prepara o schema e executa a carga idempotente de dados sintéticos em cada build. Configure exclusivamente no ambiente da plataforma:
 
 - `PORTFOLIO_DEMO=1`
 - `SECRET_KEY`: valor aleatório próprio desta implantação
@@ -46,7 +52,7 @@ O arquivo `vercel.json` encaminha a aplicação Python e serve os assets estáti
 - `CSRF_TRUSTED_ORIGINS`: origem HTTPS exata
 - `USE_FAKE_AI=1` — o modo demo também força a IA simulada independentemente desta flag.
 
-Execute a carga inicial antes de abrir a URL pública. A aplicação recusa execução na Vercel sem banco persistente e chave de sessão. Não use SQLite no filesystem temporário da hospedagem.
+O build executa a carga inicial automaticamente quando `PORTFOLIO_DEMO=1`. A integração Git publica os commits de `main`; o GitHub Actions executa a suíte de testes. A aplicação recusa execução na Vercel sem banco persistente e chave de sessão. Não use SQLite no filesystem temporário da hospedagem.
 
 ## Limites da demo
 
