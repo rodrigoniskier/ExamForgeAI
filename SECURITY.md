@@ -1,12 +1,9 @@
-# Security Policy
+# Security
 
-ExamForge AI contains synthetic demo data only and intentionally excludes the operational question database and historical audit exports.
+This public portfolio edition contains synthetic records only. Report vulnerabilities privately through GitHub security advisories; never post credentials or private data in issues.
 
-- Keep SECRET_KEY, GEMINI_API_KEY, database credentials and e-mail credentials outside Git.
-- AI output is untrusted draft content: validate structure and require human review.
-- Never auto-approve AI-generated items.
-- Use authenticated access, CSRF protection and HTTPS in production.
-- Do not publish real question banks, exams, faculty identifiers, student data or audit exports.
-- Rotate any credential that has ever been committed to a public repository.
+`PORTFOLIO_DEMO=1` must use an isolated database. Public demo identities are deliberately unprivileged. Admin access and unrestricted uploads are disabled. Inputs remain untrusted; CSRF protection and authorization still apply.
 
-Report vulnerabilities privately through GitHub Security Advisories / Private Vulnerability Reporting.
+Deployment secrets belong only in the hosting platform environment. Use a unique random `SECRET_KEY`, PostgreSQL with TLS, exact allowed hosts and HTTPS cookies. Never reuse a production database for this demo.
+
+This bounded demonstration does not provide production-grade abuse prevention. Shared demo content is visible to visitors and must not contain personal or confidential information.

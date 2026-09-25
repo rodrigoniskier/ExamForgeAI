@@ -19,12 +19,13 @@ def _extract_json(text):
     return data
 
 def _fake(topic,params):
-    return {"context":f"Demo scenario about {topic}.","stem":"Which option best addresses the scenario?","proposition_two":"","options":[{"text":"Best evidence-based option","is_correct":True},{"text":"Plausible distractor A","is_correct":False},{"text":"Plausible distractor B","is_correct":False},{"text":"Plausible distractor C","is_correct":False}],"rationale":"Synthetic rationale for portfolio testing. Human review is required.","bloom":params.get("bloom","APPLY"),"difficulty":params.get("difficulty","MEDIUM")}
+    from .demo_content import synthetic_draft
+    return synthetic_draft(topic,params)
 
 def generate_question(topic,course_name,params):
     topic=(topic or "").strip()
     if not topic or len(topic)>MAX_PROMPT_CHARS: raise ValueError("Prompt is empty or too long.")
-    if settings.USE_FAKE_AI: return _fake(topic,params)
+    if settings.PORTFOLIO_DEMO or settings.USE_FAKE_AI: return _fake(topic,params)
     if not settings.GEMINI_API_KEY: raise RuntimeError("GEMINI_API_KEY is not configured.")
     prompt=f"""You are an assessment-design assistant. Draft ONE multiple-choice item for {course_name}.
 Topic/instructions: {topic}
@@ -42,8 +43,15 @@ Exactly one option must be correct. Avoid trick wording and absolute clues. The 
     return _extract_json(text)
 
 def review_question(question):
-    if settings.USE_FAKE_AI:
-        return "DEMO REVIEW\nStructure: acceptable.\nAlignment: review against local blueprint.\nDecision remains human."
+    if settings.PORTFOLIO_DEMO or settings.USE_FAKE_AI:
+        return ("REVISÃO SIMULADA — sem API de IA\n\n"
+                + f"Estrutura: {question.options.count()} alternativas; "
+                + f"{question.options.filter(is_correct=True).count()} gabarito(s).\n"
+                + f"Demanda cognitiva: {question.get_bloom_display()}.\n"
+                + "Clareza: conferir se o comando solicita uma ação inequívoca.\n"
+                + "Distratores: revisar plausibilidade e ausência de pistas.\n"
+                + "Alinhamento: comparar o item à competência declarada.\n\n"
+                + "Este relatório demonstra o fluxo; não constitui validação por um modelo. A decisão permanece humana.")
     if not settings.GEMINI_API_KEY: raise RuntimeError("GEMINI_API_KEY is not configured.")
     options="\n".join(f"- {o.text} [{'correct' if o.is_correct else 'distractor'}]" for o in question.options.all())
     prompt=f"""Review this assessment item for clarity, alignment, plausibility of distractors, cueing, ambiguity and cognitive demand.

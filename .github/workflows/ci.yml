@@ -16,3 +16,7 @@ jobs:
         env: {SECRET_KEY: ci-secret-key, DEBUG: "1", USE_FAKE_AI: "1"}
       - run: python manage.py test
         env: {SECRET_KEY: ci-secret-key, DEBUG: "1", USE_FAKE_AI: "1"}
+      - run: python manage.py makemigrations --check --dry-run
+        env:
+          SECRET_KEY: ci-test-only-not-a-deployed-secret
+          DEBUG: "1"
