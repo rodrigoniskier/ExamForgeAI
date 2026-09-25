@@ -50,3 +50,11 @@ if os.environ.get("VERCEL"):
 if PORTFOLIO_DEMO:
     USE_FAKE_AI = True
     GEMINI_API_KEY = ""
+
+# Trust only deployment hosts injected by Vercel, including previews.
+if os.environ.get("VERCEL"):
+    for variable in ("VERCEL_URL", "VERCEL_BRANCH_URL", "VERCEL_PROJECT_PRODUCTION_URL"):
+        host = os.environ.get(variable, "").strip()
+        if host and "/" not in host:
+            ALLOWED_HOSTS.append(host)
+            CSRF_TRUSTED_ORIGINS.append("https://" + host)

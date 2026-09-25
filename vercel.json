@@ -1,25 +1,5 @@
 {
-  "builds": [
-    {
-      "src": "examforge/wsgi.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "35mb"
-      }
-    },
-    {
-      "src": "static/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "examforge/wsgi.py"
-    }
-  ]
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "django",
+  "buildCommand": "python demo_build.py"
 }
