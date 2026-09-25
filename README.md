@@ -1,65 +1,68 @@
-# ExamForge AI
+# ExamForgeAI
 
-> **Portfolio edition:** a clean, generic assessment-authoring platform inspired by a real question-bank workflow, with no institutional data or inherited repository history.
+### Banco de questões e avaliações com apoio de IA
 
-ExamForge AI combines a structured item bank with human review, assessment assembly and optional AI-assisted drafting.
+Edição pública de portfólio com dados inteiramente sintéticos. O código não depende de sistemas originais, bases institucionais ou informações pessoais.
 
-## Portfolio snapshot
+**Stack:** Django · PostgreSQL · Structured Output · Assessment
 
-This project demonstrates **assessment workflow design, Django domain modeling, AI integration, structured output validation, question approval, exam generation and LMS-ready export**.
+## O produto
 
-**Stack:** Django · PostgreSQL/SQLite · Gemini REST API · Structured JSON · Tests · CI
+Rascunho e revisão simulados; edição humana; cópia segura dos itens-base; aprovação; montagem com itens aprovados; gabarito alfabético; exportação Blackboard.
 
-## Core features
+## Demonstração
 
-- authenticated item bank;
-- courses / modules and academic terms;
-- single-answer, multiple-statement and assertion–reason items;
-- pedagogical metadata such as Bloom level, difficulty, primary area and competency;
-- pending / approved / rejected workflow;
-- AI-assisted question drafting from teacher parameters;
-- AI-assisted item review;
-- human editing before persistence;
-- manual and automatic assessment assembly;
-- answer-key view;
-- printable exam view;
-- Blackboard-compatible TXT export;
-- synthetic demo data only.
+Ative `PORTFOLIO_DEMO=1` **somente em um banco dedicado**. O acesso é feito pelo botão da tela inicial; não há senha pública nem acesso administrativo privilegiado.
 
-## Human-in-the-loop AI
+32 questões originais, 4 componentes, 2 avaliações montadas.
 
-AI output is always treated as a **draft**. The application validates the returned JSON structure and never auto-approves generated items. A teacher/editor reviews and saves the content, and only approved items enter automatic assessments.
+A publicação online e os testes em PostgreSQL/Vercel ainda precisam ser concluídos. Nenhuma URL de aplicação é anunciada como funcional antes dessa verificação.
 
-For local UI testing without API usage:
-
-```dotenv
-USE_FAKE_AI=1
-```
-
-For real AI calls:
-
-```dotenv
-GEMINI_API_KEY=...
-GEMINI_MODEL=gemini-2.5-flash
-```
-
-## Run locally
+## Execução local
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
+export SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(48))')"
+export PORTFOLIO_DEMO=1
+export DEBUG=1
 python manage.py migrate
 python manage.py seed_demo
 python manage.py runserver
 ```
 
-Demo credentials:
+Os bancos locais são ignorados pelo Git. `seed_demo` é idempotente: executá-lo novamente não duplica a base. Para restaurar uma demonstração, use um **novo banco vazio dedicado**, execute as migrations (Django) e repita a carga; não execute reset em uma base de produção.
 
-- `admin` / `Demo-Admin-12345`
-- `editor.demo` / `Demo-Editor-12345`
+## Publicação na Vercel
 
-## Origin and privacy
+O arquivo `vercel.json` encaminha a aplicação Python e serve os assets estáticos. Configure exclusivamente no ambiente da plataforma:
 
-The operational assessment system that inspired this case remains separate. ExamForge AI contains no production question database, audit exports, institutional branding, faculty/student data, e-mail credentials or inherited Git history.
+- `PORTFOLIO_DEMO=1`
+- `SECRET_KEY`: valor aleatório próprio desta implantação
+- `DATABASE_URL`: PostgreSQL dedicado, com TLS
+- `DEBUG=0`
+- `ALLOWED_HOSTS`: hostname exato da implantação
+- `CSRF_TRUSTED_ORIGINS`: origem HTTPS exata
+- `USE_FAKE_AI=1` — o modo demo também força a IA simulada independentemente desta flag.
+
+Execute a carga inicial antes de abrir a URL pública. A aplicação recusa execução na Vercel sem banco persistente e chave de sessão. Não use SQLite no filesystem temporário da hospedagem.
+
+## Limites da demo
+
+- Painel administrativo bloqueado e contas demonstrativas sem privilégios perigosos.
+- Dados de exemplo identificados como sintéticos; visitantes devem usar apenas conteúdo fictício.
+- Novos uploads bloqueados.
+- Operações de escrita limitadas; os registros-base permanecem disponíveis.
+- CSRF e headers de segurança ativos.
+- Não é um ambiente de produção nem um serviço para informações confidenciais.
+
+## Validação
+
+```bash
+python manage.py test
+```
+
+Testes de autorização, CSRF, integridade dos dados demonstrativos e fluxos principais. Dependabot e GitHub Actions preservados.
+
+Consulte [SECURITY.md](SECURITY.md). Nunca faça commit de `.env`, tokens, bancos, exports ou credenciais.

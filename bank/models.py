@@ -19,24 +19,24 @@ class Course(models.Model):
 
 class Question(models.Model):
     class Status(models.TextChoices):
-        PENDING="PENDING","Pending review"
-        APPROVED="APPROVED","Approved"
-        REJECTED="REJECTED","Rejected"
+        PENDING="PENDING","Pendente"
+        APPROVED="APPROVED","Aprovada"
+        REJECTED="REJECTED","Rejeitada"
     class Type(models.TextChoices):
-        SINGLE="SINGLE","Single answer"
-        MULTI="MULTI","Multiple statements"
-        ASSERTION="ASSERTION","Assertion–reason"
+        SINGLE="SINGLE","Resposta única"
+        MULTI="MULTI","Múltiplas afirmações"
+        ASSERTION="ASSERTION","Asserção–razão"
     class Difficulty(models.TextChoices):
-        EASY="EASY","Easy"
-        MEDIUM="MEDIUM","Medium"
-        HARD="HARD","Hard"
+        EASY="EASY","Fácil"
+        MEDIUM="MEDIUM","Média"
+        HARD="HARD","Difícil"
     class Bloom(models.TextChoices):
-        REMEMBER="REMEMBER","Remember"
-        UNDERSTAND="UNDERSTAND","Understand"
-        APPLY="APPLY","Apply"
-        ANALYZE="ANALYZE","Analyze"
-        EVALUATE="EVALUATE","Evaluate"
-        CREATE="CREATE","Create"
+        REMEMBER="REMEMBER","Lembrar"
+        UNDERSTAND="UNDERSTAND","Compreender"
+        APPLY="APPLY","Aplicar"
+        ANALYZE="ANALYZE","Analisar"
+        EVALUATE="EVALUATE","Avaliar"
+        CREATE="CREATE","Criar"
 
     course=models.ForeignKey(Course,on_delete=models.CASCADE,related_name="questions")
     author=models.ForeignKey(User,on_delete=models.PROTECT,related_name="authored_questions")
