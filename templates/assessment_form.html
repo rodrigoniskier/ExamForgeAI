@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<p class="eyebrow">Automatic assembly</p><h1>Build assessment</h1><form method="post" class="card form">{% csrf_token %}{{form.as_p}}<p class="muted">Only approved questions are eligible.</p><button class="primary">Assemble assessment</button></form>{% endblock %}
