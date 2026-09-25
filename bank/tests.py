@@ -78,3 +78,18 @@ class PortfolioDemoTests(TestCase):
         self.client.post("/demo/enter/",{"account":"editor.demo"})
         response=self.client.get("/assessments/1/")
         self.assertRegex(response.content.decode(),r"<strong>[ABCD]</strong>")
+
+    def test_reseed_preserves_visitor_items_with_matching_stems_and_titles(self):
+        from .models import Assessment,AssessmentItem
+        original=Question.objects.order_by('pk').first()
+        copy=Question.objects.create(course=original.course,author=original.author,
+            stem=original.stem,context='Rascunho criado por visitante',status='PENDING')
+        base_exam=Assessment.objects.order_by('pk').first()
+        visitor_exam=Assessment.objects.create(title=base_exam.title,
+            term=base_exam.term,created_by=base_exam.created_by)
+        before=(Question.objects.count(),Assessment.objects.count(),AssessmentItem.objects.count())
+        call_command('seed_demo',verbosity=0)
+        self.assertEqual((Question.objects.count(),Assessment.objects.count(),AssessmentItem.objects.count()),before)
+        copy.refresh_from_db()
+        self.assertEqual(copy.context,'Rascunho criado por visitante')
+        self.assertFalse(AssessmentItem.objects.filter(assessment=visitor_exam).exists())
